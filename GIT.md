@@ -25,3 +25,22 @@
    git cherry-pick <commit_keyid>
    ```
 
+**Problem** => Save temporal changes in GIT and load them later.
+
+**Solution** => 
+
+1. Stash the changes.
+
+   ```bash
+   git stash -m <comment>
+   ```
+2. Load the changes.
+
+   ```bash
+   # To see the available stashs
+   git stash list
+   # To apply the stash and delete it later
+   git stash pop stash@{id}
+   # To apply the stash and keep it
+   git stash apply stash@{id}
+   ```
