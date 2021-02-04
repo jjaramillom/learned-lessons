@@ -7,3 +7,5 @@ Useful information learned about various topics.
 [Windows Terminal](Windows_terminal.md)
 
 [React](React.md)
+
+[Tools](Tools.md)
