@@ -9,3 +9,5 @@ Useful information learned about various topics.
 [React](React.md)
 
 [Tools](Tools.md)
+
+[TypeScript](TypeScript.md)
