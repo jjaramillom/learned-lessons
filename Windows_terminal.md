@@ -1,10 +1,9 @@
 # Windows terminal
 
-## Findings
+# Findings
 
-**Problem** => Have a better appearance in PowerShell
+## Have a better appearance in PowerShell
 
-**Solution** =>
 
 1.  Install oh my posh from https://github.com/JanDeDobbeleer/oh-my-posh
 

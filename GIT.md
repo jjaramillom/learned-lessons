@@ -1,8 +1,9 @@
 # GIT
 
-**Problem** => When I created a PR, I realized one of the commits belonged to another branch, so it had to be removed from the PR. [delete commits]
+##  Problem
+When I created a PR, I realized one of the commits belonged to another branch, so it had to be removed from the PR. [delete commits]
 
-**Solution** =>
+## Solution
 
 1. Copy branch to a temporal one.
 
@@ -25,9 +26,10 @@
    git cherry-pick <commit_keyid>
    ```
 
-**Problem** => Save temporal changes in GIT and load them later.
+## Problem
+Save temporal changes in GIT and load them later.
 
-**Solution** =>
+## Solution =>
 
 1. Stash the changes.
 
@@ -46,9 +48,10 @@
    git stash apply stash@{id}
    ```
 
-**Problem** => Run something when creating a commit. In this case, linting the code.
+## Problem
+ Run something when creating a commit. In this case, linting the code.
 
-**Solution** =>
+## Solution
 
 1. Install husky and lint-staged.
 

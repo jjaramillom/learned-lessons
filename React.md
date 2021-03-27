@@ -1,15 +1,16 @@
 # React
 
-**Problem** => When should useMemo(), useCallback(), and memo() be used.
+## Problem
+When should useMemo(), useCallback(), and memo() be used.
 
-**Solution** =>
+## Solution
 
 Basically there are two main cases to use these hooks. When referential equality is needed, and when there are computationally expensive tasks.
 
 - Referential equality is needed.
 - Execution of computationally expensive tasks.
 
-1. #### Referential equality
+ ### 1. Referential equality
 
 Suppose there are two components, A & B.
 
@@ -38,7 +39,7 @@ const handleClick = useCallback(() => doSomething(), []);
 
 Now, the handleClick function won't change with every re-render. The second parameter is just like in useEffect, an array of dependencies (when should handleClick be re-defined).
 
-2. #### Computationally expensive tasks
+### 2. Computationally expensive tasks
 
 Suppose there is a component A.
 
@@ -63,13 +64,15 @@ With this, the complexResults will be the same, given that the dependencies(para
 
 ---
 
-**Problem** => Imports might become somehow cumbersome sometimes.. **eg.**
+## Problem
+Imports might become somehow cumbersome sometimes.. **eg.**
 
 ````javascript
 import Something from '../../../../components/Something'```
 ````
 
-**solution** => Use absolute imports.
+## Solution
+Use absolute imports.
 
 It is possible to add absolute paths to React within the jsconfig.json/tsconfig.json files.
 
