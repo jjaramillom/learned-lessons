@@ -1,6 +1,7 @@
 # React
 
 ## Problem
+
 When should useMemo(), useCallback(), and memo() be used.
 
 ## Solution
@@ -10,7 +11,7 @@ Basically there are two main cases to use these hooks. When referential equality
 - Referential equality is needed.
 - Execution of computationally expensive tasks.
 
- ### 1. Referential equality
+### **1. Referential equality**
 
 Suppose there are two components, A & B.
 
@@ -39,7 +40,7 @@ const handleClick = useCallback(() => doSomething(), []);
 
 Now, the handleClick function won't change with every re-render. The second parameter is just like in useEffect, an array of dependencies (when should handleClick be re-defined).
 
-### 2. Computationally expensive tasks
+### 2. **Computationally expensive tasks**
 
 Suppose there is a component A.
 
@@ -65,6 +66,7 @@ With this, the complexResults will be the same, given that the dependencies(para
 ---
 
 ## Problem
+
 Imports might become somehow cumbersome sometimes.. **eg.**
 
 ````javascript
@@ -72,6 +74,7 @@ import Something from '../../../../components/Something'```
 ````
 
 ## Solution
+
 Use absolute imports.
 
 It is possible to add absolute paths to React within the jsconfig.json/tsconfig.json files.
@@ -90,3 +93,103 @@ Now, the import would be something like:
 ````javascript
 import Something from 'components/Something'```
 ````
+
+## Redux with TS
+
+### `./actions/cartActionTypes.ts`
+
+```typescript
+import Product from '@app/models/Product';
+
+export const ADD_TO_CART = 'ADD_TO_CART';
+
+export interface AddToCart {
+  type: typeof ADD_TO_CART;
+  payload: { product: Product };
+}
+
+export type ActionTypes = AddToCart;
+
+export type Action = 'ADD_TO_CART';
+```
+
+### `./actions/cart.ts`
+
+```typescript
+import { ActionTypes, ADD_TO_CART } from './cartActionTypes';
+import Product from '@app/models/Product';
+
+export const addToCart = (product: Product): ActionTypes => ({
+  type: ADD_TO_CART,
+  payload: { product },
+});
+```
+
+### `./actions/index.ts`
+
+```typescript
+export { addToCart } from './cart';
+```
+
+### `./reducers/cart.ts`
+
+```typescript
+import { ActionTypes, AddToCart, Action } from '../actions/cartActionTypes';
+import CartItem from '@app/models/CartItem';
+
+export type State = {
+  items: CartItem[];
+};
+
+const initialState: State = {
+  items: [],
+};
+
+const addProduct = (state: State, { payload }: AddToCart): State => {
+  // do something
+};
+
+const resolversMap: Record<Action, (state: State, action: ActionTypes) => State> = {
+  ADD_TO_CART: addProduct,
+};
+
+export default (state: State = initialState, action: ActionTypes): State => {
+  if (resolversMap[action.type]) {
+    return resolversMap[action.type](state, action);
+  }
+  return state;
+};
+```
+
+### `./reducers/root.ts`
+
+```typescript
+import { combineReducers } from 'redux';
+
+import cartReducer from './cart';
+
+export const rootReducer = combineReducers({
+  cartItems: cartReducer,
+});
+
+export type RootState = ReturnType<typeof rootReducer>;
+```
+
+### `./hooks/useCartReducer.ts`
+
+```typescript
+import { useSelector, useDispatch } from 'react-redux';
+import { Dispatch } from 'redux';
+
+import { State } from '@app/store/reducers/cart';
+import { RootState } from '@app/store/reducers/root';
+
+const cartItems = (state: RootState) => state.cartItems;
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export default (): [Dispatch<any>, State] => {
+  const dispatch = useDispatch();
+  const selector = useSelector(cartItems);
+  return [dispatch, selector];
+};
+```
