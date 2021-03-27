@@ -11,3 +11,5 @@ Useful information learned about various topics.
 [Tools](Tools.md)
 
 [TypeScript](TypeScript.md)
+
+[Platzi](Platzi.md)
