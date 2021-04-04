@@ -69,9 +69,9 @@ With this, the complexResults will be the same, given that the dependencies(para
 
 Imports might become somehow cumbersome sometimes.. **eg.**
 
-````javascript
-import Something from '../../../../components/Something'```
-````
+```javascript
+import Something from '../../../../components/Something';
+```
 
 ## Solution
 
@@ -90,13 +90,30 @@ It is possible to add absolute paths to React within the jsconfig.json/tsconfig.
 
 Now, the import would be something like:
 
-````javascript
-import Something from 'components/Something'```
-````
+```javascript
+import Something from 'components/Something';
+```
+
+It could also work with custom paths like `@app`.
+
+```json
+{
+  "compilerOptions": {
+    "baseUrl": "src",
+    "paths": {
+      "@app/*": ["./src/*", "./src/*/index"]
+    }
+  }
+}
+```
+
+```javascript
+import Something from '@app/components/Something';
+```
 
 ## Redux with TS
 
-### `./actions/cartActionTypes.ts`
+### `./store/actions/cartActionTypes.ts`
 
 ```typescript
 import Product from '@app/models/Product';
@@ -113,7 +130,7 @@ export type ActionTypes = AddToCart;
 export type Action = 'ADD_TO_CART';
 ```
 
-### `./actions/cart.ts`
+### `./store/actions/cart.ts`
 
 ```typescript
 import { ActionTypes, ADD_TO_CART } from './cartActionTypes';
@@ -125,13 +142,13 @@ export const addToCart = (product: Product): ActionTypes => ({
 });
 ```
 
-### `./actions/index.ts`
+### `./store/actions/index.ts`
 
 ```typescript
 export { addToCart } from './cart';
 ```
 
-### `./reducers/cart.ts`
+### `./store/reducers/cart.ts`
 
 ```typescript
 import { ActionTypes, AddToCart, Action } from '../actions/cartActionTypes';
@@ -161,7 +178,7 @@ export default (state: State = initialState, action: ActionTypes): State => {
 };
 ```
 
-### `./reducers/root.ts`
+### `./store/reducers/root.ts`
 
 ```typescript
 import { combineReducers } from 'redux';
@@ -193,4 +210,147 @@ export default (): [Dispatch<ActionTypes>, State] => {
   const selector = useSelector(cartItems);
   return [dispatch, selector];
 };
+```
+
+## Redux with TS & @reduxjs/toolkit (even nicer)
+
+Here, the folder structure will change a bit. We move from having a folder to contain all **reducers** and a different one to contain all **actions** (and action types), to have a folder for each **reducer**.
+
+### `./store/orders/slice.ts`
+
+```typescript
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+
+import CartItem from '@app/models/CartItem';
+import Order from '@app/models/Order';
+
+interface State {
+  orders: Order[];
+}
+
+interface AddPayload {
+  items: CartItem[];
+}
+
+const initialState: State = {
+  orders: [],
+};
+
+const ordersSlice = createSlice({
+  name: 'orders',
+  initialState,
+  reducers: {
+    // reducer resolver. In this function the received state object can be mutated, which makes state managing way simpler.
+    add: (state, { payload }: PayloadAction<AddPayload>) => {
+      const newOrder = {
+        id: new Date().toString(),
+        cartItems: payload.items,
+        date: new Date(),
+        price: payload.items.reduce((prev, curr) => prev + curr.price * curr.quantity, 0),
+      };
+      state.orders.push(newOrder);
+    },
+  },
+});
+
+// The actions are exported in order to be dispatched later.
+export const { add } = ordersSlice.actions;
+
+export default ordersSlice.reducer;
+```
+
+### `./store/store.ts`
+
+```typescript
+import { configureStore } from '@reduxjs/toolkit';
+
+import cartReducer from './cart/slice';
+import ordersReducer from './orders/slice';
+
+// the store is created with the existing reducers
+const store = configureStore({
+  reducer: {
+    cartItems: cartReducer,
+    orders: ordersReducer,
+  },
+});
+
+export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;
+
+export default store;
+```
+
+### `./hooks/useReducer.ts`
+
+```typescript
+import { TypedUseSelectorHook, useSelector, useDispatch } from 'react-redux';
+
+import { RootState, AppDispatch } from '@app/store/store';
+
+// common hook for all reducers
+export default () => {
+  const dispatch = useDispatch<AppDispatch>();
+  const selector: TypedUseSelectorHook<RootState> = useSelector;
+  return { dispatch, selector };
+};
+```
+
+### `./components/Something.ts`
+
+```typescript
+import React from 'react';
+
+import { useReducer } from '@app/hooks/useReducer';
+import { add } from '@app/orders/slice';
+
+const Something = () => {
+  const { dispatch, selector } = useReducer();
+  const { orders } = selector((state) => state.orders);
+  return <button onClick={()=> dispatch(add({...}))}> add order </button>
+}
+```
+
+### Quite important. If it's required to listen to an action dispatched which was created in another slice, we can use the `extraReducers`.
+
+### e.g.
+
+### `./store/cart/slice.ts`
+
+```typescript
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+
+import CartItem from '@app/models/CartItem';
+import Product from '@app/models/Product';
+import { add } from '@app/store/orders/slice';
+
+interface State {
+  items: Record<string, CartItem>;
+  totalPrice: number;
+}
+
+const initialState: State = {
+  items: {},
+  totalPrice: 0,
+};
+
+const cartSlice = createSlice({
+  name: 'cart',
+  initialState,
+  reducers: {
+    add: {...}
+    remove: {...},
+  },
+  // Here we can mutate the local state when the addCase action (from the orders slice) is dispatched. It is also possible to chain multiple cases to react to other actions.
+  extraReducers: (builder) => {
+    builder.addCase(add, (state, action) => {
+      state.items = {};
+      state.totalPrice = 0;
+    });
+  },
+});
+
+export const { add: addProduct, remove: removeProduct } = cartSlice.actions;
+
+export default cartSlice.reducer;
 ```
