@@ -2,7 +2,7 @@
 
 Useful information learned about various topics.
 
-[GIT](GIT.md)
+[Git](Git.md)
 
 [Windows Terminal](Windows_terminal.md)
 
@@ -13,3 +13,5 @@ Useful information learned about various topics.
 [TypeScript](TypeScript.md)
 
 [Platzi](Platzi.md)
+
+[(S)CSS](CSS.md)
