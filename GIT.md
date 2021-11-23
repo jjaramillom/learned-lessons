@@ -1,9 +1,12 @@
 # GIT
 
-##  Problem
+## Problems
+
+### Problem
+
 When I created a PR, I realized one of the commits belonged to another branch, so it had to be removed from the PR. [delete commits]
 
-## Solution
+### Solution
 
 1. Copy branch to a temporal one.
 
@@ -26,10 +29,11 @@ When I created a PR, I realized one of the commits belonged to another branch, s
    git cherry-pick <commit_keyid>
    ```
 
-## Problem
+### Problem
+
 Save temporal changes in GIT and load them later.
 
-## Solution =>
+### Solution =>
 
 1. Stash the changes.
 
@@ -48,10 +52,11 @@ Save temporal changes in GIT and load them later.
    git stash apply stash@{id}
    ```
 
-## Problem
- Run something when creating a commit. In this case, linting the code.
+### Problem
 
-## Solution
+Run something when creating a commit. In this case, linting the code.
+
+### Solution
 
 1. Install husky and lint-staged.
 
@@ -89,3 +94,19 @@ Save temporal changes in GIT and load them later.
      }
    }
    ```
+
+## Concepts
+
+### Interactive rebase
+
+It serves mostly for cleaning up local commit history. It shouldn't be used with remotes, because it will re-write the commits (hashes will change).
+
+1. Determine the base commit (how far in history we want to go). For this, we could either give the commit hash, or count the number of commits.
+
+```bash
+git rebase -i HEAD~3 #This means until the 3rd commit including the head
+```
+
+Then we are gonna get a text-editor (tool for vs-code) in which we define what we want to do to each commit.
+
+- squash will combine the selected commit with the previous one
