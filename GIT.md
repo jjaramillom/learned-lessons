@@ -110,3 +110,11 @@ git rebase -i HEAD~3 #This means until the 3rd commit including the head
 Then we are gonna get a text-editor (tool for vs-code) in which we define what we want to do to each commit.
 
 - squash will combine the selected commit with the previous one
+
+### Reflog
+![image info](./images/reflog.png)
+
+
+![image info](./images/reflog2.png)
+
+With reflog we get the history of executed actions. We could then execute a reset to go before we messed up everything, which includes deleting branches and commits.
